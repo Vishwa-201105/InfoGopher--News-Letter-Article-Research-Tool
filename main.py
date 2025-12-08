@@ -9,7 +9,8 @@ import datetime
 # --- LangChain/ChromaDB Imports ---
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from langchain_community.document_loaders import SeleniumURLLoader
+# FIX: Switched from SeleniumURLLoader to the pure-Python UnstructuredURLLoader
+from langchain_community.document_loaders import UnstructuredURLLoader
 from langchain_community.vectorstores import Chroma
 from langchain_text_splitters import RecursiveCharacterTextSplitter  # Corrected class name
 from langchain_core.prompts import PromptTemplate
@@ -102,12 +103,13 @@ current_conv = st.session_state["conversations"][current_conv_id]
 load_dotenv()
 
 # --- CRITICAL ENVIRONMENT VARIABLE FIX ---
+# Checks for key in OS environment first (for Streamlit Cloud or local environment)
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 if GEMINI_API_KEY:
     os.environ["GOOGLE_API_KEY"] = GEMINI_API_KEY
 else:
-    st.error("GEMINI_API_KEY not found. Please ensure it is set in your .env file.")
+    st.error("GEMINI_API_KEY not found. Please ensure it is set in your Streamlit secrets or local .env file.")
     st.stop()
 
 
@@ -242,7 +244,7 @@ answer_button = st.button("Answer Question 💡", use_container_width=True)
 st.markdown("<br>", unsafe_allow_html=True)
 
 # ==============================================================================
-# CORE LOGIC: PROCESS URLS (INDEX CREATION) - FIX FOR READONLY DATABASE
+# CORE LOGIC: PROCESS URLS (INDEX CREATION) - WITH FIXES FOR DEPLOYMENT
 # ==============================================================================
 main_placeholder = st.empty()
 
@@ -254,7 +256,6 @@ if process_url_clicked:
     else:
 
         # --- FIX: Create a unique, new directory for the index to avoid file locks ---
-        # This prevents the "readonly database" error by creating a fresh space.
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         CHROMA_NEW_PATH = os.path.join(CHROMA_BASE_PATH, f"index_{timestamp}")
 
@@ -269,8 +270,9 @@ if process_url_clicked:
             time.sleep(0.5)
 
             # 3. Create the new index in the unique path
-        with st.spinner("⏳ Fetching and Loading Data from URLs (using Selenium)..."):
-            loader = SeleniumURLLoader(urls=urls)
+        # FIX: Switched to UnstructuredURLLoader for Streamlit Cloud compatibility
+        with st.spinner("⏳ Fetching and Loading Data from URLs (using UnstructuredURLLoader)..."):
+            loader = UnstructuredURLLoader(urls=urls)
             data = loader.load()
 
         if not data:
