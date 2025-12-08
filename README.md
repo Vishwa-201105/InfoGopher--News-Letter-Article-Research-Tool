@@ -23,5 +23,5 @@ Before running the application, ensure you have the following installed:
 ### 1. Clone the Repository
 
 ```bash
-git clone <your-repository-url>
+git clone <https://github.com/Vishwa-201105/InfoGopher--News-Letter-Article-Research-Tool>
 cd news-research-tool-project
