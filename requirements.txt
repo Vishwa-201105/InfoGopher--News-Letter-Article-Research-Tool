@@ -1,0 +1,26 @@
+# Core LangChain package (for Prompts, Retrievers, and core interfaces)
+langchain
+
+# Partner package for Gemini LLMs and Embeddings
+langchain-google-genai
+
+# Community package (for SeleniumURLLoader and FAISS Vector Store)
+langchain-community
+
+# Dedicated package for text splitting utilities
+langchain-text-splitters
+
+# UI Framework
+streamlit
+
+# Environment management
+python-dotenv
+
+# Dependencies for the robust SeleniumURLLoader
+selenium
+webdriver-manager
+
+# Dependency for web scraping when using SeleniumURLLoader
+unstructured
+
+chromadb
